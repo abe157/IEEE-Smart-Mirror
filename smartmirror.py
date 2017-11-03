@@ -20,15 +20,15 @@ ui_locale = '' # e.g. 'fr_FR' fro French, '' as default
 time_format = 12 # 12 or 24
 date_format = "%b %d, %Y" # check python doc for strftime() for options
 news_country_code = 'us'
-weather_api_token = '7d1611b46723c93de239aab1676c7129' # create account at https://darksky.net/dev/
+weather_api_token = '<TOKEN>' # create account at https://darksky.net/dev/
 weather_lang = 'en' # see https://darksky.net/dev/docs/forecast for full list of language parameters values
 weather_unit = 'us' # see https://darksky.net/dev/docs/forecast for full list of unit parameters values
-latitude = 37.8267 # Set this if IP location lookup does not work for you (must be a string)
-longitude = -122.4233 # Set this if IP location lookup does not work for you (must be a string)
-xlarge_text_size =  10#94
+latitude = None # Set this if IP location lookup does not work for you (must be a string)
+longitude = None # Set this if IP location lookup does not work for you (must be a string)
+xlarge_text_size = 20#94
 large_text_size = 15#48
 medium_text_size = 10#28
-small_text_size = 5#18 
+small_text_size = 5#18
 
 @contextmanager
 def setlocale(name): #thread proof function to work with locale
@@ -147,7 +147,7 @@ class Weather(Frame):
                 location2 = "%s, %s" % (location_obj['city'], location_obj['region_code'])
 
                 # get weather
-                weather_req_url = "https://api.darksky.net/forecast/%s/%s,%s?lang=%s&units=%s" % (weather_api_token, latitude, longitude, weather_lang, weather_unit)
+                weather_req_url = "https://api.darksky.net/forecast/%s/%s,%s?lang=%s&units=%s" % (weather_api_token, lat,lon,weather_lang,weather_unit)
             else:
                 location2 = ""
                 # get weather
@@ -171,8 +171,7 @@ class Weather(Frame):
                 if self.icon != icon2:
                     self.icon = icon2
                     image = Image.open(icon2)
-                    size = (event.width, event,hight) #!!!!
-                    image = image.resize(size, Image.ANTIALIAS) #!!!
+                    image = image.resize((20, 20), Image.ANTIALIAS)
                     image = image.convert('RGB')
                     photo = ImageTk.PhotoImage(image)
 
@@ -207,7 +206,6 @@ class Weather(Frame):
     @staticmethod
     def convert_kelvin_to_fahrenheit(kelvin_temp):
         return 1.8 * (kelvin_temp - 273) + 32
-
 
 
 class News(Frame):
