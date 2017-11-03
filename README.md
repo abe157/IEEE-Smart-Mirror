@@ -1,3 +1,6 @@
+#Source
+https://github.com/HackerHouseYT/Smart-Mirror
+
 # Smart-Mirror
 Raspberry powered mirror which can display the news, weather, and time.
 
