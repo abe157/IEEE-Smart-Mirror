@@ -171,7 +171,8 @@ class Weather(Frame):
                 if self.icon != icon2:
                     self.icon = icon2
                     image = Image.open(icon2)
-                    image = image.resize((100, 100), Image.ANTIALIAS)
+                    size = (event.width, event,hight) #!!!!
+                    image = image.resize(size, Image.ANTIALIAS) #!!!
                     image = image.convert('RGB')
                     photo = ImageTk.PhotoImage(image)
 
@@ -206,6 +207,7 @@ class Weather(Frame):
     @staticmethod
     def convert_kelvin_to_fahrenheit(kelvin_temp):
         return 1.8 * (kelvin_temp - 273) + 32
+
 
 
 class News(Frame):
