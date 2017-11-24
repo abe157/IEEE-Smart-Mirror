@@ -26,10 +26,10 @@ weather_unit = 'us'
 # Set this if IP location lookup does not work for you (must be a string)
 latitude = None 
 longitude = None 
-xlarge_text_size = 20#94
-large_text_size = 15#48
-medium_text_size = 10#28
-small_text_size = 5#18
+xlarge_text_size = 40#94
+large_text_size = 30#48
+medium_text_size = 20#28
+small_text_size = 10#18
 
 @contextmanager
 def setlocale(name): #thread proof function to work with locale
