@@ -211,6 +211,7 @@ class Weather(Frame):
             
 
 #create the window
+# !!! GET GOOGLE CALENDER API TO BECOME THE CALENDER EVENTS INSTEAD OF WORLD NEWS
 class FullWindow:
     def __init__(self):
         self.tk = Tk() #create window
@@ -234,6 +235,8 @@ class FullWindow:
 
 
 #kick off the event loop
+# !!!GET THE TIME AND UPDATE THE WEATHER ACCORDINGLY: https://stackoverflow.com/questions/415511/how-to-get-current-time-in-python
+# !!! Change from mainloop() to update() every min between the hours of 7 am and 7 pm
 if __name__ == '__main__':
     w = FullWindow()
     w.tk.mainloop()
