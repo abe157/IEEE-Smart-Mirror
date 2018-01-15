@@ -1,5 +1,5 @@
 #simple GUI
-
+from __future__ import print_function
 from Tkinter import *
 import locale
 import threading
@@ -11,6 +11,19 @@ import feedparser
 
 from PIL import Image, ImageTk
 from contextlib import contextmanager
+
+#=================================================
+
+import httplib2
+import os
+
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+
+import datetime
+#=================================================
 
 LOCALE_LOCK = threading.Lock()
 
@@ -98,7 +111,109 @@ class Clock(Frame):
             # could use >200 ms, but display gets jerky
             self.timeLbl.after(200, self.tick)
 
+class News(Frame):
+    def __init__(self, parent, *args, **kwargs):
+        Frame.__init__(self, parent, *args, **kwargs)
+        self.config(bg='black')
+        self.title = 'News' # 'News' is more internationally generic
+        self.newsLbl = Label(self, text=self.title, font=('Helvetica', medium_text_size), fg="white", bg="black")
+        self.newsLbl.pack(side=TOP, anchor=W)
+        self.headlinesContainer = Frame(self, bg="black")
+        self.headlinesContainer.pack(side=TOP)
+        self.get_headlines()
 
+
+    def get_headlines(self):
+        
+        try:
+            import argparse
+            flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+        except ImportError:
+            flags = None
+
+        # If modifying these scopes, delete your previously saved credentials
+        # at ~/.credentials/calendar-python-quickstart.json
+        SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+        CLIENT_SECRET_FILE = 'client_secret.json'
+        APPLICATION_NAME = 'Google Calendar API Python Quickstart'
+    
+        def get_credentials():
+            """Gets valid user credentials from storage.
+            
+            If nothing has been stored, or if the stored credentials are invalid,
+            the OAuth2 flow is completed to obtain the new credentials.
+            
+            Returns:
+            Credentials, the obtained credential.
+            """
+            home_dir = os.path.expanduser('~')
+            credential_dir = os.path.join(home_dir, '.credentials')
+            if not os.path.exists(credential_dir):
+                os.makedirs(credential_dir)
+            credential_path = os.path.join(credential_dir,
+                                               'calendar-python-quickstart.json')
+
+            store = Storage(credential_path)
+            credentials = store.get()
+            if not credentials or credentials.invalid:
+                flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+                flow.user_agent = APPLICATION_NAME
+                if flags:
+                    credentials = tools.run_flow(flow, store, flags)
+                else: # Needed only for compatibility with Python 2.6
+                    credentials = tools.run(flow, store)
+                print('Storing credentials to ' + credential_path)
+            return credentials
+            
+        #def RunNews():
+        """Shows basic usage of the Google Calendar API.
+
+        Creates a Google Calendar API service object and outputs a list of the next
+        10 events on the user's calendar.
+        """
+        credentials = get_credentials()
+        http = credentials.authorize(httplib2.Http())
+        service = discovery.build('calendar', 'v3', http=http)
+
+        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        print('Getting the upcoming 10 events')
+        eventsResult = service.events().list(
+            #calendarId='primary'
+            calendarId='umbc.edu_4g9lrsl8mmfm2u0b9i61cqbgqo@group.calendar.google.com', timeMin=now, maxResults=10, singleEvents=True,
+            orderBy='startTime').execute()
+        events = eventsResult.get('items', [])
+        if not events:
+            print('No upcoming events found.')
+            #headline = 'No upcoming events found.'
+            #headline.pack(side=TOP, anchor=W)
+        for event in events:
+            #start = event['start'].get('dateTime', event['start'].get('date'))
+            #headline = event['summary']
+            headline = NewsHeadline(self.headlinesContainer,event['summary'])
+            headline.pack(side=TOP, anchor=W)
+            #print(start, event['summary'])
+        
+        self.after(600000, self.get_headlines)
+
+        
+class NewsHeadline(Frame):
+    def __init__(self, parent, event_name=""):
+        Frame.__init__(self, parent, bg='black')
+
+        image = Image.open("assets/Newspaper.png")
+        image = image.resize((25, 25), Image.ANTIALIAS)
+        image = image.convert('RGB')
+        photo = ImageTk.PhotoImage(image)
+
+        self.iconLbl = Label(self, bg='black', image=photo)
+        self.iconLbl.image = photo
+        self.iconLbl.pack(side=LEFT, anchor=N)
+
+        self.eventName = event_name
+        self.eventNameLbl = Label(self, text=self.eventName, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.eventNameLbl.pack(side=LEFT, anchor=N)
+
+            
 class Weather(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, bg='black')
@@ -198,7 +313,7 @@ class Weather(Frame):
                     self.locationLbl.config(text=location2)
         except Exception as e:
             traceback.print_exc()
-            print "Error: %s. Cannot get weather." % e
+            print("Error: Cannot get weather.")
 
         self.after(600000, self.get_weather)
 
@@ -231,7 +346,9 @@ class FullWindow:
         # weather
         self.weather = Weather(self.topFrame)
         self.weather.pack(side=LEFT, anchor=N, padx=10, pady=10)
-
+        # News
+        self.news = News(self.bottomFrame)
+        self.news.pack(side=LEFT, anchor=S, padx=100, pady=100)
 
 
 #kick off the event loop
