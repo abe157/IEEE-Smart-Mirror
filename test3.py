@@ -124,7 +124,6 @@ class News(Frame):
 
 
     def get_headlines(self):
-        
         try:
             import argparse
             flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -167,8 +166,7 @@ class News(Frame):
             
         #def RunNews():
         """Shows basic usage of the Google Calendar API.
-
-        Creates a Google Calendar API service object and outputs a list of the next
+        Creates a Google Calendar API service object and outputs a list of next
         10 events on the user's calendar.
         """
         credentials = get_credentials()
@@ -176,24 +174,31 @@ class News(Frame):
         service = discovery.build('calendar', 'v3', http=http)
 
         now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-        print('Getting the upcoming 10 events')
+        temp_time = str(datetime.datetime.now().time())
+        print('Getting the upcoming 10 events at ' + temp_time[0:8])
         eventsResult = service.events().list(
             #calendarId='primary'
             calendarId='umbc.edu_4g9lrsl8mmfm2u0b9i61cqbgqo@group.calendar.google.com', timeMin=now, maxResults=10, singleEvents=True,
             orderBy='startTime').execute()
         events = eventsResult.get('items', [])
+        #!!!self.headlinesContainer.pack_forget()
+        self.headlinesContainer.pack_forget()
+        self.headlinesContainer = Frame(self, bg="black")
+        self.headlinesContainer.pack(side=TOP)
         if not events:
             print('No upcoming events found.')
+            headline = NewsHeadline(self.headlinesContainer,'No upcoming event')
+            headline.pack(side=TOP, anchor=S, fill=BOTH, expand = YES)
             #headline = 'No upcoming events found.'
             #headline.pack(side=TOP, anchor=W)
         for event in events:
             #start = event['start'].get('dateTime', event['start'].get('date'))
             #headline = event['summary']
             headline = NewsHeadline(self.headlinesContainer,event['summary'])
-            headline.pack(side=TOP, anchor=W)
+            headline.pack(side=TOP, anchor=S, fill=BOTH, expand = YES)
             #print(start, event['summary'])
         
-        self.after(600000, self.get_headlines)
+        self.after(1000, self.get_headlines)
 
         
 class NewsHeadline(Frame):
@@ -349,11 +354,21 @@ class FullWindow:
         # News
         self.news = News(self.bottomFrame)
         self.news.pack(side=LEFT, anchor=S, padx=100, pady=100)
-
-
+        
 #kick off the event loop
 # !!!GET THE TIME AND UPDATE THE WEATHER ACCORDINGLY: https://stackoverflow.com/questions/415511/how-to-get-current-time-in-python
 # !!! Change from mainloop() to update() every min between the hours of 7 am and 7 pm
 if __name__ == '__main__':
     w = FullWindow()
-    w.tk.mainloop()
+    #w.tk.mainloop()
+    
+    while(1):                                     
+        now = str(datetime.datetime.now().time()) 
+        print('update at time: ' + now[0:8])      
+        now_hr = int(now[0:2])                    
+        if((now_hr > 7) and (now_hr < 19)):
+            w.tk.update()                         
+            time.sleep(10)                        
+    
+    
+            
