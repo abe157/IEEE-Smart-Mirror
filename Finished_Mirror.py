@@ -42,7 +42,7 @@ longitude = '-76.731916'
 xlarge_text_size = 40#94
 large_text_size = 30#48
 medium_text_size = 20#28
-midsmall_text_size = 15
+midsmall_text_size = 14
 small_text_size = 10#18
 
 @contextmanager
