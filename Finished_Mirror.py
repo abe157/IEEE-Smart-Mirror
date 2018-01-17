@@ -199,7 +199,7 @@ class News(Frame):
             headline.pack(side=TOP, anchor=S, fill=BOTH, expand = YES)
             #print(start, event['summary'])
         
-        self.after(1000, self.get_headlines)
+        self.after(60000, self.get_headlines)
 
         
 class NewsHeadline(Frame):
