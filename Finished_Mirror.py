@@ -356,13 +356,13 @@ class FullWindow:
         # News
         self.news = News(self.bottomFrame)
         self.news.pack(side=LEFT, anchor=S, padx=30, pady=30)
-        
+	
+    def close(self):
+	self.tk.destroy()    
 #kick off the event loop
 # !!!GET THE TIME AND UPDATE THE WEATHER ACCORDINGLY: https://stackoverflow.com/questions/415511/how-to-get-current-time-in-python
 # !!! Change from mainloop() to update() every min between the hours of 7 am and 7 pm
 if __name__ == '__main__':
     w = FullWindow()
     w.tk.mainloop()
-    
-    
-            
+        
